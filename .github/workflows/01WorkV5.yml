@@ -89,10 +89,8 @@ jobs:
             
       - name: Insert Test Data
         run: |
-          python <<EOF
-          from pymongo import MongoClient
 
-          client = MongoClient("mongodb://localhost:27017")
+          client = MongoClient("mongodb://root:example@localhost:27017")
 
           db = client["mytododb"]
           students = db["students"]
