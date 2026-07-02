@@ -89,9 +89,20 @@ jobs:
             
       - name: Insert Test Data
         run: |
-          client = MongoClient(
-          "mongodb://root:example@localhost:27017/?authSource=admin"
-               )
+          python <<EOF
+          
+          import os
+          from pymongo import MongoClient
+
+          db_name = os.environ["MONGODB_DB_NAME"]
+          username = os.environ["MONGODB_USERNAME"]
+          password = os.environ["MONGODB_PASSWORD"]
+          host = os.environ["MONGODB_HOST"]
+          port = os.environ["MONGODB_PORT"]
+
+          uri = f"mongodb://{username}:{password}@{host}:{port}/?authSource=admin"
+
+          client = MongoClient(uri)
 
           db = client["mytododb"]
           students = db["students"]
