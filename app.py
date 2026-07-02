@@ -19,15 +19,17 @@ if not dbUser or not dbPassword:
 
 uri = (
     f"mongodb://{quote_plus(dbUser)}:{quote_plus(dbPassword)}"
-    f"@{dbHost}:{dbPort}/{dbName}"
+    f"@{dbHost}:{dbPort}"
 )
 
-'''
-uri = (
-    f"mongodb+srv://{quote_plus(dbUser)}:{quote_plus(dbPassword)}@{dbHost}/{dbName}"
-    f"?retryWrites=true&w=majority&appName={quote_plus(appName)}"
-)
-'''
+client = MongoClient(uri)
+db = client["mytododb"]
+
+if "students" not in db.list_collection_names():
+    db.create_collection("students")
+    print("Collection created")
+else:
+    print("Collection already exists")
 
 if not uri:
     raise ValueError("MONGO_URI environment variable is not set")
