@@ -4,6 +4,7 @@ on:
     branches: 
       - main  
       - dev 
+  workflow_dispatch: 
 env:
   MONGODB_DB_NAME: mytododb  # Can be used in all jobs (Global)
 
@@ -108,13 +109,13 @@ jobs:
           students = db["students"]
 
           students.insert_many([
-              {"fname":"Student01","lname":"Paul","ID":"100000"},
-              {"fname":"Student02","lname":"Paul","ID":"100001"},
-              {"fname":"Student03","lname":"Paul","ID":"100002"}
+              {"fname":"Student01","lname":"Paul","ID":"100000","phone":"017-45187"},
+              {"fname":"Student02","lname":"Paul","ID":"100001","phone":"017-45188"},
+              {"fname":"Student03","lname":"Paul","ID":"100002","phone":"017-45189"}
              
           ])
 
-          print("Test data inserted")
+          print("Test data inserted Successfully")
           EOF
 
       - name: Test app with curl
