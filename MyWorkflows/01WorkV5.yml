@@ -1,0 +1,137 @@
+name: Python My School Test Learning Artifact 
+on:  
+  push: 
+    branches: 
+      - main  
+      - dev 
+env:
+  MONGODB_DB_NAME: mytododb  # Can be used in all jobs (Global)
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install lint dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Run flake8 lint
+        id: run-lint
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+            
+      - name: Upload lint results
+        if: failure() && steps.run-lint.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results
+          path: artifacts/
+
+
+  test:
+    needs: lint
+    environment: testing  # This job runs under ENV testing 
+
+    runs-on: ubuntu-latest
+
+    #container: 
+     # image: python:3.12
+
+    
+    env: 
+      MONGODB_USERNAME: root # Need for service container below 
+      MONGODB_PASSWORD: example # Need for service container below 
+      MONGODB_CLUSTER_ADDRESS: 127.0.0.1:27017 #mongodb # Need for service container below 
+      MONGODB_CONNECTION_PROTOCOL: mongodb   # Need for service container below 
+    
+    services: 
+       mongodb: 
+        image: mongo 
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4      
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+      
+      - name: Start Flask app in background
+        run: |
+          python app.py &
+          sleep 5
+
+      - name: Test app with curl
+        run: |          
+          mkdir -p artifacts
+          pytest --junitxml=artifacts/junit.xml --cov=. --cov-report=xml:artifacts/coverage.xml          
+
+      - name: Upload Artifacts 
+        uses: actions/upload-artifact@v4
+        with:           
+          name: python-test-artifacts
+          path: artifacts/      
+         
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Debug image name
+        run: echo "${{ secrets.DOCKERHUB_USERNAME }}/my-school-pupil:2.0.0"
+
+      - name: Build docker image 
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-school-pupil:2.0.0 .
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push  Docker Image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-school-pupil:2.0.0  
+  
+  report:
+    needs: [lint]
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: Output Information 
+        run: |
+          echo "My Lint  Status"
+          echo "${{ toJson(github) }}"
+
+
+  
