@@ -11,17 +11,26 @@ app = Flask(__name__)
 dbUser = os.getenv("MONGODB_USERNAME")
 dbPassword = os.getenv("MONGODB_PASSWORD")
 dbName = os.getenv("MONGODB_DB_NAME", "mytododb")   # default if not set
-dbHost = os.getenv("MONGODB_HOST", "cluster0.mp3lyec.mongodb.net")
-appName = os.getenv("MONGODB_APP_NAME", "Cluster0")
+dbHost = os.getenv("MONGODB_HOST", "localhost")
+dbPort = os.getenv("MONGODB_PORT", "27017")
 
 if not dbUser or not dbPassword:
     raise ValueError("MONGODB_USERNAME or MONGODB_PASSWORD is not set")
 
+
+uri = (
+    f"mongodb://{quote_plus(dbUser)}:{quote_plus(dbPassword)}"
+    f"@{dbHost}:{dbPort}/{dbName}"
+)
+
+
+
+'''
 uri = (
     f"mongodb+srv://{quote_plus(dbUser)}:{quote_plus(dbPassword)}@{dbHost}/{dbName}"
     f"?retryWrites=true&w=majority&appName={quote_plus(appName)}"
 )
-
+'''
 
 if not uri:
     raise ValueError("MONGO_URI environment variable is not set")

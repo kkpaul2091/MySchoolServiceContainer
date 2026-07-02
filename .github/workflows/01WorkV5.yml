@@ -56,8 +56,9 @@ jobs:
     env: 
       MONGODB_USERNAME: root # Need for service container below 
       MONGODB_PASSWORD: example # Need for service container below 
-      MONGODB_CLUSTER_ADDRESS: 127.0.0.1:27017 # Need for service container below 
-      MONGODB_CONNECTION_PROTOCOL: mongodb   # Need for service container below 
+      MONGODB_HOST: 127.0.0.1 # Need for service container below       
+      MONGODB_DB_NAME: mytododb # Need for service container below 
+      MONGODB_PORT: 27017 # Need for service container below 
     
     services: 
        mongodb: 
