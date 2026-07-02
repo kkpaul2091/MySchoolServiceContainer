@@ -17,13 +17,10 @@ dbPort = os.getenv("MONGODB_PORT", "27017")
 if not dbUser or not dbPassword:
     raise ValueError("MONGODB_USERNAME or MONGODB_PASSWORD is not set")
 
-
 uri = (
     f"mongodb://{quote_plus(dbUser)}:{quote_plus(dbPassword)}"
     f"@{dbHost}:{dbPort}/{dbName}"
 )
-
-
 
 '''
 uri = (
