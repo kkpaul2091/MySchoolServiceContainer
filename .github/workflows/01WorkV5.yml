@@ -86,6 +86,25 @@ jobs:
         run: |
           python app.py &
           sleep 5
+            
+      - name: Insert Test Data
+        run: |
+          python <<EOF
+          from pymongo import MongoClient
+
+          client = MongoClient("mongodb://localhost:27017")
+
+          db = client["mytododb"]
+          students = db["students"]
+
+          students.insert_many([
+              {"name":"User1","email":"user1@test.com"},
+              {"name":"User2","email":"user2@test.com"},
+              {"name":"User3","email":"user3@test.com"}
+          ])
+
+          print("Test data inserted")
+          EOF
 
       - name: Test app with curl
         run: |  
