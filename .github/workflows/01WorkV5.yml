@@ -108,9 +108,10 @@ jobs:
           students = db["students"]
 
           students.insert_many([
-              {"name":"User1","email":"user1@test.com"},
-              {"name":"User2","email":"user2@test.com"},
-              {"name":"User3","email":"user3@test.com"}
+              {"fname":"Student01","lname":"Paul","ID":"100000"},
+              {"fname":"Student02","lname":"Paul","ID":"100001"},
+              {"fname":"Student03","lname":"Paul","ID":"100002"}
+             
           ])
 
           print("Test data inserted")
